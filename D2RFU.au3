@@ -13,26 +13,35 @@ Example()
 
 
 Func ExitGame()
-	$create = IniRead($inipath, "D2FU", @ComputerName & "Creator", "Default Value")
-	If $create = "True" Then
-		ToolTip("Sending Game ",0,0)
-		$exitgames = IniWrite($inipath, "D2FU", "ExitGame", "True")
-		Sleep(2000)
-		ToolTip("",0,0)
-	EndIf
+	ToolTip("Exiting Game ",0,0)
+	$exitgames = IniWrite($inipath, "D2FU", "ExitGame", "True")
+	ToolTip("",0,0)
 EndFunc
 
 
 Func SendGame()
-	$create = IniRead($inipath, "D2FU", @ComputerName & "Creator", "Default Value")
-	If $create = "True" Then
+	$single = IniRead($inipath, "D2FU", @ComputerName & "Singlepc", "Default Value")
+	if $single = "True" Then
+		ToolTip("single pc",0,0)
 		$tempgame = ClipGet()
 		ToolTip("Sending Game " & $tempgame,0,0)
 		$gamemake = IniWrite($inipath, "D2FU", "GameName", $tempgame)
 		$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "True")
-		Sleep(2000)
 		ToolTip("",0,0)
+
+	Else
+		ToolTip("Multiple pc",0,0)
+		$create = IniRead($inipath, "D2FU", @ComputerName & "Creator", "Default Value")
+		If $create = "True" Then
+			$tempgame = ClipGet()
+			ToolTip("Sending Game " & $tempgame,0,0)
+			$gamemake = IniWrite($inipath, "D2FU", "GameName", $tempgame)
+			$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "True")
+			ToolTip("",0,0)
+		EndIf
 	EndIf
+
+
 
 EndFunc
 
@@ -41,16 +50,13 @@ Func JoinWindow($data)
 	$gamepass = IniRead($inipath, "D2FU", "GamePass", "Default Value")
 	If WinExists($data) Then
 		ToolTip($data & " Window found joining " & $gamecheck & "/" & $gamepass,0,0)
-		Sleep(2000)
 		ToolTip($data & " Window Activated Joining " & $gamecheck & "/" & $gamepass,0,0)
 		If WinActivate($data) Then
 			Sleep(500)
-
 			Send($gamecheck)
 			Sleep(300)
 			Send("{TAB}")
 			Sleep(300)
-
 			Send($gamepass)
 			Sleep(300)
 			Send("{ENTER}")
@@ -128,6 +134,7 @@ Func Example()
 		$gamename = IniWrite($inipath, "D2FU", "GameName", "")
 		$gamepass = IniWrite($inipath, "D2FU", "GamePass", "")
 
+
 		ShellExecute(@ScriptName)
 		Exit
 	EndIf
@@ -187,21 +194,9 @@ Func Example()
 	$startpos1 = $startpos1 + 25
 	$startpos2 = $startpos2 + 25
 	Local $singlepc = GUICtrlCreateCheckbox("Single PC", 10, $startpos1, 90, 25)
-	If $single = "True" Then
-		GUICtrlSetState(-1, $GUI_CHECKED)
-	EndIf
 	Local $multiplepc = GUICtrlCreateCheckbox("Multiple PCS", 100, $startpos1, 185, 25)
-	If $multiple = "True" Then
-		GUICtrlSetState(-1, $GUI_CHECKED)
-	EndIf
 	Local $creator = GUICtrlCreateCheckbox("Creator", 10, $startpos1 + 25, 90, 25)
-	If $create = "True" Then
-		GUICtrlSetState(-1, $GUI_CHECKED)
-	EndIf
 	Local $follower = GUICtrlCreateCheckbox("Follower", 100, $startpos1 + 25, 185, 25)
-	If $follow = "True" Then
-		GUICtrlSetState(-1, $GUI_CHECKED)
-	EndIf
 	$startpos1 = $startpos1 + 55
 	$startpos2 = $startpos2 + 55
 	GUICtrlCreateLabel("Config:", 5, $startpos1, 50)
@@ -215,6 +210,20 @@ Func Example()
 	Local $save = GUICtrlCreateButton("Save", 5, 420, 85, 25)
 	Local $close = GUICtrlCreateButton("Close", 210, 420, 85, 25)
 
+	If $single = "True" Then
+		GUICtrlSetState($singlepc, $GUI_CHECKED)
+		GUICtrlSetState($follower,$GUI_DISABLE)
+		GUICtrlSetState($creator,$GUI_DISABLE)
+	EndIf
+	If $multiple = "True" Then
+		GUICtrlSetState($multiplepc, $GUI_CHECKED)
+	EndIf
+	If $follow = "True" Then
+		GUICtrlSetState($follower, $GUI_CHECKED)
+	EndIf
+	If $create = "True" Then
+		GUICtrlSetState($creator, $GUI_CHECKED)
+	EndIf
 	; Display the GUI.
 	GUISetState(@SW_SHOW, $hGUI)
 
@@ -222,37 +231,67 @@ Func Example()
 
 
 	While 1
-		If $follow = "True" Then
-			$gamecheck = IniRead($inipath, "D2FU", "JoinGame", "Default Value")
-			$exitcheck = IniRead($inipath, "D2FU", "ExitGame", "Default Value")
-			if $gamecheck = "True" Then
-				$char1v = IniRead($inipath, "D2FU", "Window1", "Default Value")
-				$char2v = IniRead($inipath, "D2FU", "Window2", "Default Value")
-				$char3v = IniRead($inipath, "D2FU", "Window3", "Default Value")
-				$char4v = IniRead($inipath, "D2FU", "Window4", "Default Value")
-				$char5v = IniRead($inipath, "D2FU", "Window5", "Default Value")
-				$char6v = IniRead($inipath, "D2FU", "Window6", "Default Value")
-				$char7v = IniRead($inipath, "D2FU", "Window7", "Default Value")
-				$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "False")
-				JoinWindow($char1v)
-				JoinWindow($char2v)
-			EndIf
-			if $exitcheck = "True" Then
-				$char1v = IniRead($inipath, "D2FU", "Window1", "Default Value")
-				$char2v = IniRead($inipath, "D2FU", "Window2", "Default Value")
-				$char3v = IniRead($inipath, "D2FU", "Window3", "Default Value")
-				$char4v = IniRead($inipath, "D2FU", "Window4", "Default Value")
-				$char5v = IniRead($inipath, "D2FU", "Window5", "Default Value")
-				$char6v = IniRead($inipath, "D2FU", "Window6", "Default Value")
-				$char7v = IniRead($inipath, "D2FU", "Window7", "Default Value")
-				$exitgame = IniWrite($inipath, "D2FU", "ExitGame", "False")
-				ExitWindow($char1v)
-				ExitWindow($char2v)
-			EndIf
+		If $single = "True" Then
 
+				$gamecheck = IniRead($inipath, "D2FU", "JoinGame", "Default Value")
+				$exitcheck = IniRead($inipath, "D2FU", "ExitGame", "Default Value")
+				$mainv = IniRead($inipath, "D2FU", "Mainwindow", "Default Value")
+				if $gamecheck = "True" Then
+					For $i = 1 To 7 Step +1
+						$wincheck = IniRead($inipath, "D2FU", "Window" & $i, "Default Value")
+						if $wincheck Then
+							JoinWindow($wincheck)
+						EndIf
+					Next
+					$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "False")
+					If WinActivate($mainv) Then
+					Else
+						ToolTip("FAILED TO ACTIVATE " & $mainv,0,0)
+					EndIf
+				EndIf
+				if $exitcheck = "True" Then
+					ToolTip("Waiting to exit",0,0)
+					Sleep(1000)
+					For $i = 1 To 7 Step +1
+						$wincheck = IniRead($inipath, "D2FU", "Window" & $i, "Default Value")
+						if $wincheck Then
+							ExitWindow($wincheck)
+						EndIf
+					Next
+					$gamemake = IniWrite($inipath, "D2FU", "ExitGame", "False")
+					If WinActivate($mainv) Then
+					Else
+						ToolTip("FAILED TO ACTIVATE " & $mainv,0,0)
+					EndIf
+		Else
+			If $follow = "True" Then
+				$gamecheck = IniRead($inipath, "D2FU", "JoinGame", "Default Value")
+				$exitcheck = IniRead($inipath, "D2FU", "ExitGame", "Default Value")
+				if $gamecheck = "True" Then
+					For $i = 1 To 7 Step +1
+						$wincheck = IniRead($inipath, "D2FU", "Window" & $i, "Default Value")
+						if $wincheck Then
+							JoinWindow($wincheck)
+						EndIf
+					Next
+					$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "False")
+				EndIf
+				if $exitcheck = "True" Then
+					For $i = 1 To 7 Step +1
+						$wincheck = IniRead($inipath, "D2FU", "Window" & $i, "Default Value")
+						if $wincheck Then
+							ExitWindow($wincheck)
+						EndIf
+					Next
+					$exitgame = IniWrite($inipath, "D2FU", "ExitGame", "False")
+				EndIf
+		EndIf
 		EndIf
 
 
+
+
+		EndIf
 		Switch GUIGetMsg()
 			Case $singlepc
 				If _IsChecked($multiplepc) Then
@@ -261,8 +300,13 @@ Func Example()
 				Else
 					If _IsChecked($singlepc) Then
 						$single = IniWrite($inipath, "D2FU", @ComputerName & "Singlepc", "True")
+						$single = "True"
+						GUICtrlSetState($follower,$GUI_DISABLE)
+						GUICtrlSetState($creator,$GUI_DISABLE)
 					Else
 						$single = IniWrite($inipath, "D2FU", @ComputerName & "Singlepc", "False")
+						GUICtrlSetState($follower,$GUI_ENABLE)
+						GUICtrlSetState($creator,$GUI_ENABLE)
 					EndIf
 				EndIf
 			Case $multiplepc
