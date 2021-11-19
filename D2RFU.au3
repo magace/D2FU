@@ -7,96 +7,8 @@ Local Const $inipath = @ScriptDir & "/config.ini"
 Local $go = False
 HotKeySet("{numpad1}", "SendGame")
 HotKeySet("{numpad2}", "ExitGame")
-
-
-Example()
-
-
-Func ExitGame()
-	ToolTip("Exiting Game ",0,0)
-	$exitgames = IniWrite($inipath, "D2FU", "ExitGame", "True")
-	ToolTip("",0,0)
-EndFunc
-
-
-Func SendGame()
-	$single = IniRead($inipath, "D2FU", @ComputerName & "Singlepc", "Default Value")
-	if $single = "True" Then
-		ToolTip("single pc",0,0)
-		$tempgame = ClipGet()
-		ToolTip("Sending Game " & $tempgame,0,0)
-		$gamemake = IniWrite($inipath, "D2FU", "GameName", $tempgame)
-		$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "True")
-		ToolTip("",0,0)
-
-	Else
-		ToolTip("Multiple pc",0,0)
-		$create = IniRead($inipath, "D2FU", @ComputerName & "Creator", "Default Value")
-		If $create = "True" Then
-			$tempgame = ClipGet()
-			ToolTip("Sending Game " & $tempgame,0,0)
-			$gamemake = IniWrite($inipath, "D2FU", "GameName", $tempgame)
-			$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "True")
-			ToolTip("",0,0)
-		EndIf
-	EndIf
-
-
-
-EndFunc
-
-Func JoinWindow($data)
-	$gamecheck = IniRead($inipath, "D2FU", "GameName", "Default Value")
-	$gamepass = IniRead($inipath, "D2FU", "GamePass", "Default Value")
-	If WinExists($data) Then
-		ToolTip($data & " Window found joining " & $gamecheck & "/" & $gamepass,0,0)
-		ToolTip($data & " Window Activated Joining " & $gamecheck & "/" & $gamepass,0,0)
-		If WinActivate($data) Then
-			Sleep(500)
-			Send($gamecheck)
-			Sleep(300)
-			Send("{TAB}")
-			Sleep(300)
-			Send($gamepass)
-			Sleep(300)
-			Send("{ENTER}")
-		Else
-			ToolTip("FAILED TO ACTIVATE " & $data,0,0)
-		EndIf
-	Else
-		ToolTip($data & " Window not found",0,0)
-	EndIf
-	ToolTip("",0,0)
-EndFunc
-
-Func ExitWindow($data)
-	$gamecheck = IniRead($inipath, "D2FU", "GameName", "Default Value")
-	$gamepass = IniRead($inipath, "D2FU", "GamePass", "Default Value")
-	If WinExists($data) Then
-		ToolTip($data & " Window found exiting " & $gamecheck & "/" & $gamepass,0,0)
-		Sleep(2000)
-		ToolTip($data & " Window Activated exiting " & $gamecheck & "/" & $gamepass,0,0)
-		If WinActivate($data) Then
-			Sleep(500)
-			Send("{ESCAPE}")
-			Sleep(300)
-			Send("{DOWN}")
-			Sleep(100)
-			Send("{DOWN}")
-			Sleep(100)
-			Send("{up}")
-			Sleep(100)
-			Send("{enter}")
-		Else
-			ToolTip("FAILED TO ACTIVATE " & $data,0,0)
-		EndIf
-	Else
-		ToolTip($data & " Window not found",0,0)
-	EndIf
-	ToolTip("",0,0)
-EndFunc
-
-Func Example()
+D2FU()
+Func D2FU()
 	Local $iFileExists = FileExists($inipath)
 	; Display a message of whether the file exists or not.
 	If $iFileExists Then
@@ -114,7 +26,6 @@ Func Example()
 		$create = IniRead($inipath, "D2FU", @ComputerName & "Creator", "Default Value")
 		$netpath = IniRead($inipath, "D2FU", "ConfigPath", "Default Value")
 		$gamepass = IniRead($inipath, "D2FU", "GamePass", "Default Value")
-
 	Else
 		$mainv = IniWrite($inipath, "D2FU", "Mainwindow", "")
 		$char1v = IniWrite($inipath, "D2FU", "Window1", "")
@@ -133,14 +44,10 @@ Func Example()
 		$exitgame = IniWrite($inipath, "D2FU", "ExitGame", "False")
 		$gamename = IniWrite($inipath, "D2FU", "GameName", "")
 		$gamepass = IniWrite($inipath, "D2FU", "GamePass", "")
-
-
 		ShellExecute(@ScriptName)
 		Exit
 	EndIf
-	; Create a GUI with various controls.
 	Local $hGUI = GUICreate("D2RFU", 300, 450)
-	; Create a button control.
 	GUICtrlCreateLabel("DR RESURECTED FOLLOW YOU", 55, 10, 350)
 	$startpos1 = 53
 	$startpos2 = 50
@@ -205,11 +112,8 @@ Func Example()
 	$startpos2 = $startpos2 + 25
 	GUICtrlCreateLabel("Password:", 5, $startpos1, 50)
 	Local $gamepassword = GUICtrlCreateInput($gamepass, 55, $startpos2, 200, 20)
-
-
 	Local $save = GUICtrlCreateButton("Save", 5, 420, 85, 25)
 	Local $close = GUICtrlCreateButton("Close", 210, 420, 85, 25)
-
 	If $single = "True" Then
 		GUICtrlSetState($singlepc, $GUI_CHECKED)
 		GUICtrlSetState($follower,$GUI_DISABLE)
@@ -224,15 +128,10 @@ Func Example()
 	If $create = "True" Then
 		GUICtrlSetState($creator, $GUI_CHECKED)
 	EndIf
-	; Display the GUI.
 	GUISetState(@SW_SHOW, $hGUI)
-
 	Local $iPID = 0
-
-
 	While 1
 		If $single = "True" Then
-
 				$gamecheck = IniRead($inipath, "D2FU", "JoinGame", "Default Value")
 				$exitcheck = IniRead($inipath, "D2FU", "ExitGame", "Default Value")
 				$mainv = IniRead($inipath, "D2FU", "Mainwindow", "Default Value")
@@ -282,15 +181,11 @@ Func Example()
 						if $wincheck Then
 							ExitWindow($wincheck)
 						EndIf
-					Next
-					$exitgame = IniWrite($inipath, "D2FU", "ExitGame", "False")
+						Next
+						$exitgame = IniWrite($inipath, "D2FU", "ExitGame", "False")
+					EndIf
 				EndIf
-		EndIf
-		EndIf
-
-
-
-
+			EndIf
 		EndIf
 		Switch GUIGetMsg()
 			Case $singlepc
@@ -320,9 +215,6 @@ Func Example()
 						$single = IniWrite($inipath, "D2FU", @ComputerName & "Multiplepc", "False")
 					EndIf
 				EndIf
-
-
-
 			Case $creator
 				If _IsChecked($follower) Then
 					MsgBox($MB_SYSTEMMODAL, "Error...", "Select creator OR follower...", 0, $hGUI)
@@ -345,11 +237,8 @@ Func Example()
 						$single = IniWrite($inipath, "D2FU", @ComputerName & "Follower", "False")
 					EndIf
 				EndIf
-
-
 			Case $GUI_EVENT_CLOSE, $close
 				ExitLoop
-
 			Case $save
 				IniWrite($inipath, "D2FU", "Mainwindow", GUICtrlRead($main))
 				IniWrite($inipath, "D2FU", "Window1", GUICtrlRead($char1))
@@ -368,6 +257,84 @@ Func Example()
 	If $iPID Then ProcessClose($iPID)
 EndFunc   ;==>Example
 
+Func ExitGame()
+	ToolTip("Exiting Game ",0,0)
+	$exitgames = IniWrite($inipath, "D2FU", "ExitGame", "True")
+	ToolTip("",0,0)
+EndFunc
+
+Func SendGame()
+	$single = IniRead($inipath, "D2FU", @ComputerName & "Singlepc", "Default Value")
+	if $single = "True" Then
+		ToolTip("single pc",0,0)
+		$tempgame = ClipGet()
+		ToolTip("Sending Game " & $tempgame,0,0)
+		$gamemake = IniWrite($inipath, "D2FU", "GameName", $tempgame)
+		$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "True")
+		ToolTip("",0,0)
+	Else
+		ToolTip("Multiple pc",0,0)
+		$create = IniRead($inipath, "D2FU", @ComputerName & "Creator", "Default Value")
+		If $create = "True" Then
+			$tempgame = ClipGet()
+			ToolTip("Sending Game " & $tempgame,0,0)
+			$gamemake = IniWrite($inipath, "D2FU", "GameName", $tempgame)
+			$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "True")
+			ToolTip("",0,0)
+		EndIf
+	EndIf
+EndFunc
+
+Func JoinWindow($data)
+	$gamecheck = IniRead($inipath, "D2FU", "GameName", "Default Value")
+	$gamepass = IniRead($inipath, "D2FU", "GamePass", "Default Value")
+	If WinExists($data) Then
+		ToolTip($data & " Window found joining " & $gamecheck & "/" & $gamepass,0,0)
+		ToolTip($data & " Window Activated Joining " & $gamecheck & "/" & $gamepass,0,0)
+		If WinActivate($data) Then
+			Sleep(500)
+			Send($gamecheck)
+			Sleep(300)
+			Send("{TAB}")
+			Sleep(300)
+			Send($gamepass)
+			Sleep(300)
+			Send("{ENTER}")
+		Else
+			ToolTip("FAILED TO ACTIVATE " & $data,0,0)
+		EndIf
+	Else
+		ToolTip($data & " Window not found",0,0)
+	EndIf
+	ToolTip("",0,0)
+EndFunc
+
+Func ExitWindow($data)
+	$gamecheck = IniRead($inipath, "D2FU", "GameName", "Default Value")
+	$gamepass = IniRead($inipath, "D2FU", "GamePass", "Default Value")
+	If WinExists($data) Then
+		ToolTip($data & " Window found exiting " & $gamecheck & "/" & $gamepass,0,0)
+		Sleep(2000)
+		ToolTip($data & " Window Activated exiting " & $gamecheck & "/" & $gamepass,0,0)
+		If WinActivate($data) Then
+			Sleep(500)
+			Send("{ESCAPE}")
+			Sleep(300)
+			Send("{DOWN}")
+			Sleep(100)
+			Send("{DOWN}")
+			Sleep(100)
+			Send("{up}")
+			Sleep(100)
+			Send("{enter}")
+		Else
+			ToolTip("FAILED TO ACTIVATE " & $data,0,0)
+		EndIf
+	Else
+		ToolTip($data & " Window not found",0,0)
+	EndIf
+	ToolTip("",0,0)
+EndFunc
 
 Func _IsChecked($idControlID)
 	Return BitAND(GUICtrlRead($idControlID), $GUI_CHECKED) = $GUI_CHECKED
