@@ -2,6 +2,7 @@
 #include <GUIConstantsEx.au3>
 #include <AutoItConstants.au3>
 #include <MsgBoxConstants.au3>
+#include <TrayConstants.au3>
 Opt("WinTitleMatchMode", 3)
 Local Const $inipath = @ScriptDir & "/config.ini"
 Local $go = False
@@ -10,7 +11,6 @@ HotKeySet("{numpad2}", "ExitGame")
 D2FU()
 Func D2FU()
 	Local $iFileExists = FileExists($inipath)
-	; Display a message of whether the file exists or not.
 	If $iFileExists Then
 		$mainv = IniRead($inipath, "D2FU", "Mainwindow", "Default Value")
 		$char1v = IniRead($inipath, "D2FU", "Window1", "Default Value")
@@ -132,6 +132,8 @@ Func D2FU()
 	Local $iPID = 0
 	While 1
 		If $single = "True" Then
+			ToolTip("Single true")
+			Sleep(1000)
 				$gamecheck = IniRead($inipath, "D2FU", "JoinGame", "Default Value")
 				$exitcheck = IniRead($inipath, "D2FU", "ExitGame", "Default Value")
 				$mainv = IniRead($inipath, "D2FU", "Mainwindow", "Default Value")
@@ -161,15 +163,22 @@ Func D2FU()
 					If WinActivate($mainv) Then
 					Else
 						ToolTip("FAILED TO ACTIVATE " & $mainv,0,0)
+				EndIf
+					Else
+
 					EndIf
-		Else
+
+		EndIf
 			If $follow = "True" Then
 				$gamecheck = IniRead($inipath, "D2FU", "JoinGame", "Default Value")
 				$exitcheck = IniRead($inipath, "D2FU", "ExitGame", "Default Value")
 				if $gamecheck = "True" Then
+					Sleep(1000)
 					For $i = 1 To 7 Step +1
 						$wincheck = IniRead($inipath, "D2FU", "Window" & $i, "Default Value")
 						if $wincheck Then
+							ToolTip("Window check")
+							Sleep(2000)
 							JoinWindow($wincheck)
 						EndIf
 					Next
@@ -185,8 +194,6 @@ Func D2FU()
 						$exitgame = IniWrite($inipath, "D2FU", "ExitGame", "False")
 					EndIf
 				EndIf
-			EndIf
-		EndIf
 		Switch GUIGetMsg()
 			Case $singlepc
 				If _IsChecked($multiplepc) Then
@@ -258,39 +265,39 @@ Func D2FU()
 EndFunc   ;==>Example
 
 Func ExitGame()
-	ToolTip("Exiting Game ",0,0)
+	TrayTip("Exiting", "All Games", 3)
 	$exitgames = IniWrite($inipath, "D2FU", "ExitGame", "True")
 	ToolTip("",0,0)
 EndFunc
 
 Func SendGame()
 	$single = IniRead($inipath, "D2FU", @ComputerName & "Singlepc", "Default Value")
+	$multiple = IniRead($inipath, "D2FU", @ComputerName & "Multiplepc", "Default Value")
 	if $single = "True" Then
-		ToolTip("single pc",0,0)
 		$tempgame = ClipGet()
-		ToolTip("Sending Game " & $tempgame,0,0)
+		TrayTip("Sending Single Game", $tempgame, 0, $TIP_ICONASTERISK)
 		$gamemake = IniWrite($inipath, "D2FU", "GameName", $tempgame)
 		$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "True")
-		ToolTip("",0,0)
-	Else
-		ToolTip("Multiple pc",0,0)
+	EndIf
+
+	if $multiple = "True" Then
 		$create = IniRead($inipath, "D2FU", @ComputerName & "Creator", "Default Value")
 		If $create = "True" Then
 			$tempgame = ClipGet()
-			ToolTip("Sending Game " & $tempgame,0,0)
-			$gamemake = IniWrite($inipath, "D2FU", "GameName", $tempgame)
+			$gamemaket = IniWrite($inipath, "D2FU", "GameName", $tempgame)
 			$gamemake = IniWrite($inipath, "D2FU", "JoinGame", "True")
-			ToolTip("",0,0)
+			TrayTip("Sending Multiple Game", $tempgame, 3)
+
 		EndIf
 	EndIf
+
 EndFunc
 
 Func JoinWindow($data)
 	$gamecheck = IniRead($inipath, "D2FU", "GameName", "Default Value")
 	$gamepass = IniRead($inipath, "D2FU", "GamePass", "Default Value")
 	If WinExists($data) Then
-		ToolTip($data & " Window found joining " & $gamecheck & "/" & $gamepass,0,0)
-		ToolTip($data & " Window Activated Joining " & $gamecheck & "/" & $gamepass,0,0)
+		TrayTip($data & " Joining Game", $gamecheck & "/" & $gamepass, 3)
 		If WinActivate($data) Then
 			Sleep(500)
 			Send($gamecheck)
@@ -313,9 +320,7 @@ Func ExitWindow($data)
 	$gamecheck = IniRead($inipath, "D2FU", "GameName", "Default Value")
 	$gamepass = IniRead($inipath, "D2FU", "GamePass", "Default Value")
 	If WinExists($data) Then
-		ToolTip($data & " Window found exiting " & $gamecheck & "/" & $gamepass,0,0)
-		Sleep(2000)
-		ToolTip($data & " Window Activated exiting " & $gamecheck & "/" & $gamepass,0,0)
+		TrayTip($data & " Exiting Game", $gamecheck & "/" & $gamepass, 3)
 		If WinActivate($data) Then
 			Sleep(500)
 			Send("{ESCAPE}")
